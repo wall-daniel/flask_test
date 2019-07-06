@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import request
 import sqlite3 as sql
-import os
+import os as os
 
 database_path = os.getcwd() + "/database.db"
 
@@ -51,16 +51,13 @@ def addrec():
         with sql.connect(database_path) as con:
             con.row_factory = sql.Row
             cur = con.cursor()
-            cur.execute("select * from students")
-            rows = cur.fetchall()
+            cur.execute('select * from students')
 
-            list = ""
-            for row in rows:
-                for item in row:
-                    list += str(item) + ","
-                list += "\n"
+            msg = cur.fetchall()
+            print(str(msg))
+            desc = cur.keys()
 
-            return list
+            return str(desc)
 
 @app.route('/user/<user>', methods=['GET', 'POST'])
 def user_test(user):
