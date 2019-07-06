@@ -1,6 +1,10 @@
 from flask import Flask
 from flask import request
 import sqlite3 as sql
+import os
+
+database_path = os.getcwd() + "/database.db"
+
 app = Flask(__name__)
 
 list = ['hello', 'world', 'running', 'test']
@@ -19,6 +23,7 @@ def new_student(name):
 
 @app.route('/addrec', methods = ['GET', 'POST'])
 def addrec():
+    print(database_path)
     if request.method == 'POST':
         try:
             #print(request)
@@ -28,7 +33,7 @@ def addrec():
             pin = request.form['pin']
 
             print("here")
-            with sql.connect("/home/dwall/Programming/flask_test/database.db") as con:
+            with sql.connect(database_path) as con:
                 cur = con.cursor()
                 cur.execute("INSERT INTO students (name,addr,city,pin) VALUES (?,?,?,?)", (name,address,city,pin))
 
@@ -43,14 +48,13 @@ def addrec():
             #con.close()
             return msg
     else:
-        with sql.connect("/home/dwall/Programming/flask_test/database.db") as con:
+        with sql.connect(database_path) as con:
             con.row_factory = sql.Row
             cur = con.cursor()
             cur.execute("select * from students")
             rows = cur.fetchall()
 
             list = ""
-            print(rows)
             for row in rows:
                 for item in row:
                     list += str(item) + ","
