@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request
 import sqlite3 as sql
 import os as os
+import json
 
 database_path = os.getcwd() + "/database.db"
 
@@ -25,6 +26,9 @@ def new_student(name):
 def addrec():
     print(database_path)
     if request.method == 'POST':
+        data = request.json
+        data["mhmm"] = 1
+        return(str(data))
         try:
             #print(request)
             name = request.form['name']
@@ -48,16 +52,30 @@ def addrec():
             #con.close()
             return msg
     else:
-        with sql.connect(database_path) as con:
-            con.row_factory = sql.Row
-            cur = con.cursor()
-            cur.execute('select * from students')
+        data = request.get_json()
 
-            msg = cur.fetchall()
-            print(str(msg))
-            desc = cur.keys()
+        if data == None:
+            with sql.connect(database_path) as con:
+                con.row_factory = sql.Row
+                cur = con.cursor()
+                cur.execute('PRAGMA table_info(students);')
 
-            return str(desc)
+                rows = cur.fetchall()
+
+                schema = []
+
+                i = 0
+                for row in rows:
+                    type = {}
+                    type['type'] = row['type'].lower()
+                    type['text'] = row['name']
+                    type['id'] = 0
+                    schema.append(type)
+
+                return json.dumps(schema)
+        else:
+            data["mhm"] = 2
+            return str(data)
 
 @app.route('/user/<user>', methods=['GET', 'POST'])
 def user_test(user):
